@@ -1,0 +1,69 @@
+use mydb;
+
+create table tb_test01(
+    col1 varchar(10),
+    col2 varchar(20),
+    col3 varchar(30)
+);
+
+create table tb_test02(
+    id int,
+    name varchar(30),
+    height decimal(3, 1),
+    birth date
+);
+
+-- table copy 하는 방법-1
+create table tb_test03 as select * from jobs;
+drop table tb_test03;
+-- table copy 하는 방법-2 이 방법이 더 안전하다.
+create table if not exists tb_test03 select *from jobs;
+drop table tb_test03;
+-- table copy 하는 방법-3 필요한 컬럼만 빼서 테이블 생성
+create table tb_test03 as select job_id as jobid, max_salary as maxal from jobs;
+drop table tb_test03;
+-- table copy 하는 방법-3 필요한 컬럼만 만듬 , 데이터는 미포함
+create table if not exists tb_test04 like jobs;
+
+create table tb_test05
+select department_id as dnum, sum(salary) as "sum", avg(salary) as "avg"
+from employees
+group by department_id;
+
+-- object : create, drop, alter
+-- data : insert, delete, select, update
+
+-- 컬럼 이름 변경
+alter table tb_test04
+rename
+to tb_test99;
+
+-- 컬럼 추가
+alter table tb_test99 add newcol1 varchar(30);
+
+alter table tb_test99 add (col2_new decimal(5, 1), col3_new date);
+
+desc tb_test99;
+
+-- 컬럼 데이터형 수정
+alter table tb_test99 modify newcol1 int;
+
+-- 컬럼명 변경(col2_new를 new_col2로)
+alter table tb_test99 change col2_new new_col2 varchar(20);
+
+-- 컬럼 삭제
+alter table tb_test99 drop column newcol1;
+
+-- 테이블 컬럼명만 복사, 데이터 복사 x, where 1=2가 옵션을 의미
+create table dept as select * from departments where 1=2;
+drop table dept;
+-- insert
+insert into dept(department_id, department_name, manager_id, location_id) values (10, '기획부', 100, 101);
+insert into dept(department_id, department_name) values (20, '관리부');
+insert into dept values (101, '머머부', 101, 102);
+-- departmnet_name이 not null로 설정되어있어서 데이터 삽입 불가능
+# insert into dept(department_id) values (30);
+
+-- 삭제
+delete from dept where department_name = "머머부";
+
